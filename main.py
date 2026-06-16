@@ -1,5 +1,7 @@
 import random
 
+from numpy import append
+
 MAX_LINES = 3
 MAX_BET = 500
 MIN_BET = 1
@@ -27,6 +29,7 @@ symbol_values = {
 
 def check_winnings(columns, lines, bet, values):
     winnings = 0
+    winning_lines = []
     for line in range(lines):
         symbol = columns[0][line]
         for column in columns:
@@ -35,7 +38,8 @@ def check_winnings(columns, lines, bet, values):
                 break
         else: 
             winnings += values[symbol] * bet
-    return winnings
+            winning_lines.append(lines + 1)
+    return winnings, winning_lines
             
             
 
@@ -118,9 +122,8 @@ def get_valid_bet(balance, lines):
             print(f"The Total bet is {total_bet}")
         else:
             return bet, total_bet
-
-def main():
-    balance = deposit()
+        
+def spin(balance):
     lines = get_number_of_lines()
     bet, total_bet = get_valid_bet(balance, lines) 
     
@@ -133,10 +136,24 @@ def main():
     slots = get_slot_machine_spin(ROWS, COLS, symbol_count)
     print_slot_machine(slots) 
     
-    winnings = check_winnings(slots, lines, bet, symbol_values)
+    winnings, winning_lines = check_winnings(slots, lines, bet, symbol_values)
     print(f"You Won P{winnings}")
+    print(f"You Won on lines:", *winning_lines)
+    return winnings - total_bet
 
 
 
+def main():
+    balance = deposit()
+    
+    while True:
+        print(f"Current Balance is: P{balance}")
+        play = input("Press (Enter) to continue, (q) to quit")
+        if play == "q":
+            break
+        balance += spin(balance)
+    
+    print(f"You left with P{balance}")
+    
 main()  
         
